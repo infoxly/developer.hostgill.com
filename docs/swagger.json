@@ -1,0 +1,425 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HostGill API",
+    "version": "3.0.3",
+    "description": "All domain actions (DomainGetInfo, ModNS, TransferLock, AddCns, ModCns, DelCns, AddDNSSEC, DelDNSSEC, RegisterDomain) are POST requests to /domain/details.php or /domain/register.php.\nRequired headers for all endpoints:\n  - auth-uuid\n  - api-key\n  - my-origin"
+  },
+  "servers": [
+    {
+      "url": "https://api-new.dotbx.com/v1/client/",
+      "description": "Staging server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "AuthUUID": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "auth-uuid",
+        "description": "Unique Auth UUID (required)"
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "api-key",
+        "description": "API Key (required)"
+      },
+      "MyOrigin": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "my-origin",
+        "description": "Origin URL (required)",
+        "x-default": "https://api-new.dotbx.com/"
+      }
+    },
+    "schemas": {
+      "GenericRequest": {
+        "type": "object",
+        "description": "Generic request with action and relevant fields.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Action to perform (e.g. DomainGetInfo, ModNS, etc.)"
+          },
+          "order_id": { "type": "string" },
+          "name_server": { "type": "string" },
+          "transfer_lock": { "type": "boolean" },
+          "host": { "type": "string" },
+          "host_name": { "type": "string" },
+          "ip_address": { "type": "string" },
+          "key_tag": { "type": "string" },
+          "algorithm": { "type": "string" },
+          "digest_type": { "type": "string" },
+          "digest": { "type": "string" }
+        },
+        "example": {
+          "action": "DomainGetInfo",
+          "order_id": "12345"
+        }
+      },
+      "RegisterSingleDomainRequest": {
+        "type": "object",
+        "description": "Request body for registering a single domain.",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain name to register",
+            "example": "example2.net"
+          },
+          "years": {
+            "type": "integer",
+            "description": "Registration period in years",
+            "example": 1
+          },
+          "registrant_handle": {
+            "type": "integer",
+            "description": "Registrant contact handle ID",
+            "example": 101
+          },
+          "admin_handle": {
+            "type": "integer",
+            "description": "Admin contact handle ID",
+            "example": 101
+          },
+          "tech_handle": {
+            "type": "integer",
+            "description": "Tech contact handle ID",
+            "example": 101
+          },
+          "billing_handle": {
+            "type": "integer",
+            "description": "Billing contact handle ID",
+            "example": 101
+          },
+          "privacy": {
+            "type": "boolean",
+            "description": "Enable privacy protection",
+            "example": false
+          },
+          "name_server": {
+            "type": "string",
+            "description": "Comma-separated name servers",
+            "example": "dns1.hostgill.com,dns2.hostgill.com"
+          }
+        },
+        "required": [
+          "domain",
+          "years",
+          "registrant_handle",
+          "admin_handle",
+          "tech_handle",
+          "billing_handle",
+          "privacy",
+          "name_server"
+        ]
+      },
+      "TransferSingleDomainRequest": {
+        "type": "object",
+        "description": "Request body for registering a single domain.",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Domain name to register",
+            "example": "example2.net"
+          },
+          "auth_code": {
+            "type": "string",
+            "description": "Domain Password",
+            "example": "authcode@1234"
+          },
+          "years": {
+            "type": "integer",
+            "description": "Registration period in years",
+            "example": 1
+          },
+          "registrant_handle": {
+            "type": "integer",
+            "description": "Registrant contact handle ID",
+            "example": 101
+          },
+          "admin_handle": {
+            "type": "integer",
+            "description": "Admin contact handle ID",
+            "example": 101
+          },
+          "tech_handle": {
+            "type": "integer",
+            "description": "Tech contact handle ID",
+            "example": 101
+          },
+          "billing_handle": {
+            "type": "integer",
+            "description": "Billing contact handle ID",
+            "example": 101
+          },
+          "privacy": {
+            "type": "boolean",
+            "description": "Enable privacy protection",
+            "example": false
+          },
+          "name_server": {
+            "type": "string",
+            "description": "Comma-separated name servers",
+            "example": "dns1.hostgill.com,dns2.hostgill.com"
+          }
+        },
+        "required": [
+          "domain",
+          "years",
+          "registrant_handle",
+          "admin_handle",
+          "tech_handle",
+          "billing_handle",
+          "privacy",
+          "name_server"
+        ]
+      },
+      "GenericSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "actionstatusdesc": { "type": "string", "example": "Operation successful" }
+        }
+      },
+      "GenericErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": { "type": "string", "example": "Error message" }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "AuthUUID": [],
+      "ApiKey": [],
+      "MyOrigin": []
+    }
+  ],
+  "paths": {
+    "/domain/register.php": {
+      "post": {
+        "summary": "Register Single Domain",
+        "security": [
+          {
+            "AuthUUID": [],
+            "ApiKey": [],
+            "MyOrigin": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSingleDomainRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Domain Registered Successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request / Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Invalid API key or auth-uuid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (No permission)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/domain/transfer.php": {
+      "post": {
+        "summary": "Transfer Single Domain",
+        "security": [
+          {
+            "AuthUUID": [],
+            "ApiKey": [],
+            "MyOrigin": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferSingleDomainRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Domain Transfer Started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request / Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Invalid API key or auth-uuid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (No permission)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/domain/details.php": {
+      "post": {
+        "summary": "Get Domain Info",
+        "security": [
+          {
+            "AuthUUID": [],
+            "ApiKey": [],
+            "MyOrigin": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request / Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Invalid API key or auth-uuid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (No permission)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
